@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Program 90 Hari - PE & Stamina</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f0f1a; color: #e0e0e0; padding: 16px; }
+  h1 { text-align: center; color: #7c6af7; font-size: 1.5em; margin-bottom: 4px; }
+  .subtitle { text-align: center; color: #999; font-size: 0.85em; margin-bottom: 20px; }
+
+  /* TABS */
+  .tab-nav { display: flex; gap: 6px; margin-bottom: 20px; }
+  .tab-btn { flex: 1; padding: 10px 6px; border-radius: 8px; border: 1px solid #2a2a4a; background: #1a1a2e; color: #999; font-size: 0.8em; cursor: pointer; text-align: center; transition: all 0.2s; }
+  .tab-btn.active { background: #7c6af7; border-color: #7c6af7; color: #fff; font-weight: 600; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* PHASES */
+  .phase { background: #1a1a2e; border-radius: 12px; margin-bottom: 16px; overflow: hidden; border: 1px solid #2a2a4a; }
+  .phase-header { padding: 14px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .phase-1 .phase-header { background: linear-gradient(90deg, #1e3a5f, #1a1a2e); border-left: 4px solid #3b82f6; }
+  .phase-2 .phase-header { background: linear-gradient(90deg, #3a1e5f, #1a1a2e); border-left: 4px solid #8b5cf6; }
+  .phase-3 .phase-header { background: linear-gradient(90deg, #1e5f3a, #1a1a2e); border-left: 4px solid #10b981; }
+  .phase-s1 .phase-header { background: linear-gradient(90deg, #5f3a1e, #1a1a2e); border-left: 4px solid #f59e0b; }
+  .phase-s2 .phase-header { background: linear-gradient(90deg, #1e4a5f, #1a1a2e); border-left: 4px solid #06b6d4; }
+  .phase-s3 .phase-header { background: linear-gradient(90deg, #3a2e1e, #1a1a2e); border-left: 4px solid #f97316; }
+  .phase-icon { font-size: 1.3em; }
+  .phase-title { flex: 1; }
+  .phase-title h2 { font-size: 1em; color: #fff; }
+  .phase-title p { font-size: 0.78em; color: #aaa; margin-top: 2px; }
+  .phase-badge { background: #2a2a4a; padding: 3px 8px; border-radius: 20px; font-size: 0.72em; color: #bbb; white-space: nowrap; }
+  .phase-content { padding: 16px; display: none; }
+  .phase-content.open { display: block; }
+
+  .week { background: #12122a; border-radius: 8px; padding: 12px; margin-bottom: 12px; border: 1px solid #2a2a4a; }
+  .week h3 { color: #a78bfa; font-size: 0.9em; margin-bottom: 10px; border-bottom: 1px solid #2a2a4a; padding-bottom: 6px; }
+  .exercise { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+  .ex-icon { font-size: 1em; margin-top: 2px; min-width: 20px; }
+  .ex-detail { flex: 1; }
+  .ex-name { font-size: 0.86em; font-weight: 600; color: #e0e0e0; }
+  .ex-desc { font-size: 0.78em; color: #999; margin-top: 2px; line-height: 1.4; }
+  .ex-sets { display: inline-block; background: #2a2a4a; border-radius: 4px; padding: 2px 8px; font-size: 0.73em; color: #7c6af7; margin-top: 4px; }
+  .tip-box { background: #1e3a1e; border-left: 3px solid #10b981; border-radius: 6px; padding: 10px 12px; margin-top: 10px; font-size: 0.8em; color: #a0d4a0; line-height: 1.5; }
+  .warning-box { background: #3a1e1e; border-left: 3px solid #ef4444; border-radius: 6px; padding: 10px 12px; margin-top: 10px; font-size: 0.8em; color: #f4a0a0; line-height: 1.5; }
+  .info-box { background: #1e2a3a; border-left: 3px solid #3b82f6; border-radius: 6px; padding: 10px 12px; margin-top: 10px; font-size: 0.8em; color: #a0c4f4; line-height: 1.5; }
+
+  /* WEEKLY SCHEDULE */
+  .schedule { background: #12122a; border-radius: 8px; padding: 12px; margin-bottom: 16px; border: 1px solid #2a2a4a; }
+  .schedule h3 { color: #f59e0b; font-size: 0.9em; margin-bottom: 10px; }
+  .day-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; }
+  .day-label { font-size: 0.75em; color: #888; min-width: 36px; }
+  .day-tag { font-size: 0.72em; padding: 3px 8px; border-radius: 4px; }
+  .tag-cardio { background: #1e3a5f; color: #60a5fa; }
+  .tag-strength { background: #3a1e5f; color: #a78bfa; }
+  .tag-kegel { background: #1e5f3a; color: #34d399; }
+  .tag-rest { background: #2a2a2a; color: #666; }
+  .tag-yoga { background: #5f3a1e; color: #fbbf24; }
+
+  /* PROGRESS BAR */
+  .progress-bar { height: 5px; background: #2a2a4a; border-radius: 3px; margin: 12px 0 8px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; }
+  .p1-fill { background: linear-gradient(90deg, #3b82f6, #60a5fa); width: 33%; }
+  .p2-fill { background: linear-gradient(90deg, #8b5cf6, #a78bfa); width: 66%; }
+  .p3-fill { background: linear-gradient(90deg, #10b981, #34d399); width: 100%; }
+  .ps1-fill { background: linear-gradient(90deg, #f59e0b, #fbbf24); width: 33%; }
+  .ps2-fill { background: linear-gradient(90deg, #06b6d4, #22d3ee); width: 66%; }
+  .ps3-fill { background: linear-gradient(90deg, #f97316, #fb923c); width: 100%; }
+
+  /* TRACKER */
+  .tracker { background: #1a1a2e; border-radius: 12px; padding: 16px; border: 1px solid #2a2a4a; margin-top: 16px; }
+  .tracker h2 { color: #7c6af7; font-size: 0.95em; margin-bottom: 12px; }
+  .tracker-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+  .tracker-tab { flex: 1; padding: 6px; border-radius: 6px; border: 1px solid #2a2a4a; background: #12122a; color: #888; font-size: 0.75em; cursor: pointer; text-align: center; }
+  .tracker-tab.active { background: #2a2a4a; color: #fff; border-color: #7c6af7; }
+  .day-grid { display: grid; grid-template-columns: repeat(13, 1fr); gap: 3px; }
+  .day-btn { aspect-ratio: 1; border-radius: 3px; background: #12122a; border: 1px solid #2a2a4a; cursor: pointer; font-size: 0.58em; color: #555; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .day-btn:hover { border-color: #7c6af7; color: #aaa; }
+  .day-btn.done-pe { background: #7c6af7; border-color: #7c6af7; color: #fff; }
+  .day-btn.done-stamina { background: #f59e0b; border-color: #f59e0b; color: #fff; }
+  .day-btn.done-both { background: linear-gradient(135deg, #7c6af7, #f59e0b); border-color: #f59e0b; color: #fff; }
+  .day-btn.today { border-color: #10b981; color: #10b981; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .stat { background: #12122a; border-radius: 8px; padding: 10px; text-align: center; border: 1px solid #2a2a4a; }
+  .stat-val { font-size: 1.4em; font-weight: 700; color: #7c6af7; }
+  .stat-label { font-size: 0.68em; color: #777; margin-top: 2px; }
+  .btn-row { display: flex; gap: 8px; margin-top: 12px; }
+  .mark-btn { flex: 1; padding: 8px; border-radius: 6px; font-size: 0.8em; cursor: pointer; border: none; font-weight: 600; }
+  .mark-pe { background: #7c6af7; color: #fff; }
+  .mark-stamina { background: #f59e0b; color: #fff; }
+  .reset-btn { display: block; margin: 10px auto 0; background: transparent; border: 1px solid #333; color: #666; border-radius: 6px; padding: 5px 14px; font-size: 0.75em; cursor: pointer; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; font-size: 0.72em; color: #777; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<h1>💪 Program 90 Hari</h1>
+<p class="subtitle">PE Control · Stamina · Ereksi Kuat</p>
+
+<div class="tab-nav">
+  <div class="tab-btn active" onclick="switchTab('pe')">🎯 PE Control</div>
+  <div class="tab-btn" onclick="switchTab('stamina')">⚡ Stamina & Ereksi</div>
+  <div class="tab-btn" onclick="switchTab('tracker')">📊 Tracker</div>
+</div>
+
+<!-- TAB 1: PE CONTROL -->
+<div id="tab-pe" class="tab-content active">
+
+  <div class="phase phase-1">
+    <div class="phase-header" onclick="toggle('p1')">
+      <div class="phase-icon">🔵</div>
+      <div class="phase-title">
+        <h2>FASE 1 — Fondasi</h2>
+        <p>Hari 1–30 · Kenali otot PC, bangun kebiasaan</p>
+      </div>
+      <div class="phase-badge">Hari 1-30</div>
+    </div>
+    <div id="p1" class="phase-content open">
+      <div class="progress-bar"><div class="progress-fill p1-fill"></div></div>
+      <div class="week">
+        <h3>📅 Minggu 1–2: Aktivasi</h3>
+        <div class="exercise">
+          <div class="ex-icon">🔵</div>
+          <div class="ex-detail">
+            <div class="ex-name">Slow Kegel</div>
+            <div class="ex-desc">Kencangkan otot PC, tahan, lepas.</div>
+            <span class="ex-sets">10x · tahan 3 detik · lepas 3 detik · 2x sehari</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">⚡</div>
+          <div class="ex-detail">
+            <div class="ex-name">Rapid Kegel</div>
+            <div class="ex-desc">Kencang dan lepas cepat-cepat.</div>
+            <span class="ex-sets">10x cepat · 2 set · 2x sehari</span>
+          </div>
+        </div>
+        <div class="tip-box">💡 Lakukan pagi setelah bangun + malam sebelum tidur. Bisa sambil rebahan.</div>
+      </div>
+      <div class="week">
+        <h3>📅 Minggu 3–4: Penguatan</h3>
+        <div class="exercise">
+          <div class="ex-icon">🔵</div>
+          <div class="ex-detail">
+            <div class="ex-name">Slow Kegel</div>
+            <span class="ex-sets">10x · tahan 5 detik · lepas 5 detik · 3 set · 2x sehari</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">⚡</div>
+          <div class="ex-detail">
+            <div class="ex-name">Rapid Kegel</div>
+            <span class="ex-sets">3 set x 10x · 2x sehari</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">🛑</div>
+          <div class="ex-detail">
+            <div class="ex-name">Start-Stop Solo</div>
+            <div class="ex-desc">Berhenti saat 70% mendekati klimaks. Tunggu 30 detik. Ulangi 3-4x.</div>
+            <span class="ex-sets">3-4x seminggu · tanpa bokep</span>
+          </div>
+        </div>
+        <div class="warning-box">⚠️ Stop masturbasi pakai bokep — ini bagian penting dari reset otak.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase phase-2">
+    <div class="phase-header" onclick="toggle('p2')">
+      <div class="phase-icon">🟣</div>
+      <div class="phase-title">
+        <h2>FASE 2 — Kontrol</h2>
+        <p>Hari 31–60 · Latih kontrol ejakulasi aktif</p>
+      </div>
+      <div class="phase-badge">Hari 31-60</div>
+    </div>
+    <div id="p2" class="phase-content">
+      <div class="progress-bar"><div class="progress-fill p2-fill"></div></div>
+      <div class="week">
+        <h3>📅 Minggu 5–6: Intensifikasi</h3>
+        <div class="exercise">
+          <div class="ex-icon">🔵</div>
+          <div class="ex-detail">
+            <div class="ex-name">Slow Kegel Advanced</div>
+            <span class="ex-sets">15x · tahan 7 detik · lepas 5 detik · 3 set</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">💪</div>
+          <div class="ex-detail">
+            <div class="ex-name">Long Hold Kegel</div>
+            <div class="ex-desc">Tahan selama mungkin dengan kekuatan penuh.</div>
+            <span class="ex-sets">3x · tahan 20-30 detik · 3x seminggu saja</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">⚡</div>
+          <div class="ex-detail">
+            <div class="ex-name">Rapid Kegel</div>
+            <span class="ex-sets">5 set x 10x · 2x sehari</span>
+          </div>
+        </div>
+      </div>
+      <div class="week">
+        <h3>📅 Minggu 7–8: Edging + Squeeze</h3>
+        <div class="exercise">
+          <div class="ex-icon">🛑</div>
+          <div class="ex-detail">
+            <div class="ex-name">Edging + Kegel Squeeze</div>
+            <div class="ex-desc">Saat mendekati klimaks, kencangkan otot PC kuat + berhenti. Tahan 10 detik.</div>
+            <span class="ex-sets">4-5x stop per sesi · 4x seminggu</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">🤏</div>
+          <div class="ex-detail">
+            <div class="ex-name">Squeeze Technique</div>
+            <div class="ex-desc">Tekan area antara glans dan batang dengan ibu jari + telunjuk selama 10-20 detik.</div>
+            <span class="ex-sets">Kombinasikan dengan edging</span>
+          </div>
+        </div>
+        <div class="tip-box">💡 Mulai terapkan teknik pause and tease saat berhubungan dengan pasangan.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase phase-3">
+    <div class="phase-header" onclick="toggle('p3')">
+      <div class="phase-icon">🟢</div>
+      <div class="phase-title">
+        <h2>FASE 3 — Mastery</h2>
+        <p>Hari 61–90 · Kontrol penuh & aplikasi nyata</p>
+      </div>
+      <div class="phase-badge">Hari 61-90</div>
+    </div>
+    <div id="p3" class="phase-content">
+      <div class="progress-bar"><div class="progress-fill p3-fill"></div></div>
+      <div class="week">
+        <h3>📅 Minggu 9–13: Full Mastery</h3>
+        <div class="exercise">
+          <div class="ex-icon">🔵</div>
+          <div class="ex-detail">
+            <div class="ex-name">Full Kegel Routine</div>
+            <span class="ex-sets">20x slow [10 detik] + 5 set rapid + 3x long hold [30 detik]</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">🧘</div>
+          <div class="ex-detail">
+            <div class="ex-name">Mindfulness Breathing</div>
+            <div class="ex-desc">Saat berhubungan, fokus napas dalam dan lambat. Menurunkan adrenalin, memperlambat ejakulasi.</div>
+            <span class="ex-sets">Terapkan setiap sesi</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">🎯</div>
+          <div class="ex-detail">
+            <div class="ex-name">Aplikasi dengan Pasangan</div>
+            <div class="ex-desc">Foreplay 15-20 menit → penetrasi + pause and tease → kegel squeeze saat mendekati klimaks.</div>
+            <span class="ex-sets">Target durasi 10-15 menit</span>
+          </div>
+        </div>
+        <div class="tip-box">🏆 Di titik ini 55-83% pria sudah mengalami peningkatan signifikan berdasarkan riset medis!</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 2: STAMINA & EREKSI -->
+<div id="tab-stamina" class="tab-content">
+
+  <div class="info-box" style="margin-bottom:16px">
+    ⚡ Program ini melengkapi program PE. Jalankan <b>bersamaan</b> dengan Kegel setiap hari untuk hasil maksimal.
+  </div>
+
+  <!-- JADWAL MINGGUAN -->
+  <div class="schedule">
+    <h3>📅 Jadwal Mingguan Ideal</h3>
+    <div class="day-row"><div class="day-label">Senin</div><div class="day-tag tag-cardio">Kardio 30 menit</div><div class="day-tag tag-strength">Squat + Deadlift</div><div class="day-tag tag-kegel">Kegel</div></div>
+    <div class="day-row"><div class="day-label">Selasa</div><div class="day-tag tag-yoga">Yoga / Stretch</div><div class="day-tag tag-kegel">Kegel</div></div>
+    <div class="day-row"><div class="day-label">Rabu</div><div class="day-tag tag-cardio">Kardio 30 menit</div><div class="day-tag tag-strength">Hip Thrust + Plank</div><div class="day-tag tag-kegel">Kegel</div></div>
+    <div class="day-row"><div class="day-label">Kamis</div><div class="day-tag tag-rest">Istirahat aktif</div><div class="day-tag tag-kegel">Kegel</div></div>
+    <div class="day-row"><div class="day-label">Jumat</div><div class="day-tag tag-cardio">Kardio 30 menit</div><div class="day-tag tag-strength">Squat + Hip Thrust</div><div class="day-tag tag-kegel">Kegel</div></div>
+    <div class="day-row"><div class="day-label">Sabtu</div><div class="day-tag tag-strength">Full Body ringan</div><div class="day-tag tag-kegel">Kegel</div></div>
+    <div class="day-row"><div class="day-label">Minggu</div><div class="day-tag tag-rest">Rest total</div></div>
+  </div>
+
+  <div class="phase phase-s1">
+    <div class="phase-header" onclick="toggle('ps1')">
+      <div class="phase-icon">🏃</div>
+      <div class="phase-title">
+        <h2>KARDIO — Stamina & Aliran Darah</h2>
+        <p>Meningkatkan suplai darah ke penis + stamina ranjang</p>
+      </div>
+      <div class="phase-badge">3-4x seminggu</div>
+    </div>
+    <div id="ps1" class="phase-content open">
+      <div class="progress-bar"><div class="progress-fill ps1-fill"></div></div>
+      <div class="week">
+        <h3>🏃 Minggu 1-4: Bangun Base</h3>
+        <div class="exercise">
+          <div class="ex-icon">🏃</div>
+          <div class="ex-detail">
+            <div class="ex-name">Lari / Jalan Cepat</div>
+            <div class="ex-desc">Pace santai, bisa ngobrol. Ini zone terbaik untuk kesehatan kardiovaskular penis.</div>
+            <span class="ex-sets">20-25 menit · 3x seminggu</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">🚴</div>
+          <div class="ex-detail">
+            <div class="ex-name">Sepeda / Renang</div>
+            <div class="ex-desc">Alternatif lari. Renang sangat bagus karena full body + tidak ada tekanan sendi.</div>
+            <span class="ex-sets">30 menit · bisa gantian dengan lari</span>
+          </div>
+        </div>
+      </div>
+      <div class="week">
+        <h3>🔥 Minggu 5-13: HIIT untuk Testosteron</h3>
+        <div class="exercise">
+          <div class="ex-icon">⚡</div>
+          <div class="ex-detail">
+            <div class="ex-name">HIIT Sprint</div>
+            <div class="ex-desc">Sprint 30 detik sekuat mungkin → jalan 90 detik. Ulangi. HIIT terbukti meningkatkan testosteron lebih cepat dari kardio biasa.</div>
+            <span class="ex-sets">8 ronde · total 20 menit · 2x seminggu</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">🏃</div>
+          <div class="ex-detail">
+            <div class="ex-name">Steady State Cardio</div>
+            <div class="ex-desc">Tetap lanjutkan lari santai di hari lain.</div>
+            <span class="ex-sets">30 menit · 2x seminggu</span>
+          </div>
+        </div>
+        <div class="tip-box">💡 Kardio rutin meningkatkan produksi Nitric Oxide — zat yang membuat pembuluh darah penis melebar dan ereksi lebih keras.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase phase-s2">
+    <div class="phase-header" onclick="toggle('ps2')">
+      <div class="phase-icon">🏋️</div>
+      <div class="phase-title">
+        <h2>STRENGTH — Testosteron & Kekuatan</h2>
+        <p>Latihan beban yang langsung boost testosteron alami</p>
+      </div>
+      <div class="phase-badge">2-3x seminggu</div>
+    </div>
+    <div id="ps2" class="phase-content">
+      <div class="progress-bar"><div class="progress-fill ps2-fill"></div></div>
+      <div class="week">
+        <h3>💪 Big 3 untuk Testosteron</h3>
+        <div class="exercise">
+          <div class="ex-icon">🏋️</div>
+          <div class="ex-detail">
+            <div class="ex-name">Squat</div>
+            <div class="ex-desc">Raja latihan testosteron. Melatih otot terbesar tubuh = produksi testosteron maksimal. Bisa pakai barbel, dumbbell, atau bodyweight dulu.</div>
+            <span class="ex-sets">3 set x 12 rep · istirahat 90 detik</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">🏋️</div>
+          <div class="ex-detail">
+            <div class="ex-name">Deadlift</div>
+            <div class="ex-desc">Melatih posterior chain (punggung, glutes, hamstring) — otot utama saat penetrasi. Mulai dengan beban ringan, fokus form.</div>
+            <span class="ex-sets">3 set x 10 rep · istirahat 2 menit</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">🫸</div>
+          <div class="ex-detail">
+            <div class="ex-name">Push Up / Bench Press</div>
+            <div class="ex-desc">Upper body strength untuk stamina dan posisi.</div>
+            <span class="ex-sets">3 set x 15 rep</span>
+          </div>
+        </div>
+      </div>
+      <div class="week">
+        <h3>🎯 Latihan Spesifik Performa</h3>
+        <div class="exercise">
+          <div class="ex-icon">🍑</div>
+          <div class="ex-detail">
+            <div class="ex-name">Hip Thrust</div>
+            <div class="ex-desc">Langsung melatih otot glutes dan pinggul yang dipakai saat thrusting. Bisa pakai beban atau bodyweight.</div>
+            <span class="ex-sets">3 set x 15 rep · 2-3x seminggu</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">🧱</div>
+          <div class="ex-detail">
+            <div class="ex-name">Plank</div>
+            <div class="ex-desc">Core stability = kontrol gerakan lebih baik dan tidak mudah lelah.</div>
+            <span class="ex-sets">3x · tahan 45-60 detik · setiap hari</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">🦵</div>
+          <div class="ex-detail">
+            <div class="ex-name">Lunges</div>
+            <div class="ex-desc">Melatih keseimbangan dan kekuatan kaki — penting untuk berbagai posisi.</div>
+            <span class="ex-sets">3 set x 12 rep per kaki</span>
+          </div>
+        </div>
+        <div class="tip-box">💡 Squat dan Deadlift adalah dua latihan dengan bukti terkuat untuk meningkatkan testosteron alami. Tidak perlu gym mahal — bisa pakai beban seadanya.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase phase-s3">
+    <div class="phase-header" onclick="toggle('ps3')">
+      <div class="phase-icon">🥗</div>
+      <div class="phase-title">
+        <h2>NUTRISI & RECOVERY</h2>
+        <p>Makanan dan istirahat yang boost testosteron & ereksi</p>
+      </div>
+      <div class="phase-badge">Setiap hari</div>
+    </div>
+    <div id="ps3" class="phase-content">
+      <div class="progress-bar"><div class="progress-fill ps3-fill"></div></div>
+      <div class="week">
+        <h3>🥩 Nutrisi Kunci</h3>
+        <div class="exercise">
+          <div class="ex-icon">🥚</div>
+          <div class="ex-detail">
+            <div class="ex-name">Zinc — Booster Testosteron</div>
+            <div class="ex-desc">Zinc deficiency langsung menurunkan testosteron.</div>
+            <span class="ex-sets">Telur, daging merah, tiram, kacang mete</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">🥜</div>
+          <div class="ex-detail">
+            <div class="ex-name">L-Arginine — Ereksi Lebih Keras</div>
+            <div class="ex-desc">Prekursor Nitric Oxide yang melebarkan pembuluh darah penis.</div>
+            <span class="ex-sets">Kacang almond, semangka, daging ayam, ikan</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">🐟</div>
+          <div class="ex-detail">
+            <div class="ex-name">Omega-3 — Sirkulasi Darah</div>
+            <div class="ex-desc">Menjaga kesehatan pembuluh darah agar darah mengalir lancar ke penis.</div>
+            <span class="ex-sets">Ikan salmon, sarden, tuna · 3x seminggu</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">☀️</div>
+          <div class="ex-detail">
+            <div class="ex-name">Vitamin D — Testosteron Alami</div>
+            <div class="ex-desc">Defisiensi Vitamin D sangat umum dan langsung turunkan testosteron.</div>
+            <span class="ex-sets">Sinar matahari pagi 15-20 menit setiap hari</span>
+          </div>
+        </div>
+      </div>
+      <div class="week">
+        <h3>😴 Recovery — Sering Diabaikan</h3>
+        <div class="exercise">
+          <div class="ex-icon">💤</div>
+          <div class="ex-detail">
+            <div class="ex-name">Tidur 7-8 Jam</div>
+            <div class="ex-desc">90% testosteron diproduksi saat tidur. Kurang tidur = testosteron anjlok = ereksi melemah.</div>
+            <span class="ex-sets">Prioritas utama — jangan dikurangi</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">💧</div>
+          <div class="ex-detail">
+            <div class="ex-name">Minum Air 2-3 Liter/hari</div>
+            <div class="ex-desc">Dehidrasi mengurangi volume darah dan kualitas ereksi.</div>
+            <span class="ex-sets">Setiap hari</span>
+          </div>
+        </div>
+        <div class="exercise">
+          <div class="ex-icon">🚭</div>
+          <div class="ex-detail">
+            <div class="ex-name">Kurangi / Stop Rokok</div>
+            <div class="ex-desc">Rokok merusak pembuluh darah kecil di penis — penyebab utama ereksi lemah jangka panjang.</div>
+            <span class="ex-sets">Ini game changer terbesar</span>
+          </div>
+        </div>
+        <div class="warning-box">⚠️ Rokok dan kurang tidur adalah dua musuh terbesar ereksi yang sering diabaikan. Lebih berpengaruh dari suplemen apapun.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 3: TRACKER -->
+<div id="tab-tracker" class="tab-content">
+  <div class="tracker">
+    <h2>📊 Daily Tracker — 90 Hari</h2>
+    <div class="tracker-tabs">
+      <div class="tracker-tab active" onclick="switchTrackerTab('both')">Semua</div>
+      <div class="tracker-tab" onclick="switchTrackerTab('pe')">🎯 PE</div>
+      <div class="tracker-tab" onclick="switchTrackerTab('stamina')">⚡ Stamina</div>
+    </div>
+    <div class="day-grid" id="dayGrid"></div>
+    <div class="legend">
+      <span><div class="dot" style="background:#7c6af7"></div> PE selesai</span>
+      <span><div class="dot" style="background:#f59e0b"></div> Stamina selesai</span>
+      <span><div class="dot" style="background:linear-gradient(135deg,#7c6af7,#f59e0b)"></div> Keduanya</span>
+      <span><div class="dot" style="background:#12122a;border:1px solid #10b981"></div> Hari ini</span>
+    </div>
+    <div class="btn-row">
+      <button class="mark-btn mark-pe" onclick="markToday('pe')">✅ PE Selesai Hari Ini</button>
+      <button class="mark-btn mark-stamina" onclick="markToday('stamina')">✅ Stamina Selesai</button>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-val" id="statDone">0</div>
+        <div class="stat-label">Hari Selesai</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="statStreak">0</div>
+        <div class="stat-label">Streak 🔥</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="statBoth">0</div>
+        <div class="stat-label">Hari Komplit 💪</div>
+      </div>
+    </div>
+    <button class="reset-btn" onclick="resetTracker()">Reset Tracker</button>
+  </div>
+</div>
+
+<script>
+// Tab switching
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function toggle(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+// Tracker
+const KEY = 'program90_v2';
+let data = { startDay: null, pe: [], stamina: [] };
+let currentTrackerTab = 'both';
+
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) data = JSON.parse(raw);
+  } catch(e) {}
+}
+
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e) {}
+}
+
+function getToday() {
+  if (!data.startDay) return 1;
+  const start = new Date(data.startDay);
+  const now = new Date();
+  const diff = Math.floor((now - start) / 86400000) + 1;
+  return Math.min(Math.max(diff, 1), 90);
+}
+
+function markToday(type) {
+  if (!data.startDay) data.startDay = new Date().toISOString().split('T')[0];
+  const day = getToday();
+  if (!data[type].includes(day)) {
+    data[type].push(day);
+    save();
+    renderGrid();
+  }
+}
+
+function switchTrackerTab(t) {
+  currentTrackerTab = t;
+  document.querySelectorAll('.tracker-tab').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderGrid();
+}
+
+function renderGrid() {
+  const grid = document.getElementById('dayGrid');
+  grid.innerHTML = '';
+  const today = getToday();
+  const peSet = new Set(data.pe);
+  const stamSet = new Set(data.stamina);
+
+  for (let i = 1; i <= 90; i++) {
+    const btn = document.createElement('div');
+    btn.className = 'day-btn';
+    btn.textContent = i;
+    const hasPe = peSet.has(i);
+    const hasStam = stamSet.has(i);
+
+    if (currentTrackerTab === 'pe') {
+      if (hasPe) btn.classList.add('done-pe');
+    } else if (currentTrackerTab === 'stamina') {
+      if (hasStam) btn.classList.add('done-stamina');
+    } else {
+      if (hasPe && hasStam) btn.classList.add('done-both');
+      else if (hasPe) btn.classList.add('done-pe');
+      else if (hasStam) btn.classList.add('done-stamina');
+    }
+
+    if (i === today && !hasPe && !hasStam) btn.classList.add('today');
+    grid.appendChild(btn);
+  }
+  updateStats();
+}
+
+function updateStats() {
+  const peSet = new Set(data.pe);
+  const stamSet = new Set(data.stamina);
+  const allDays = new Set([...data.pe, ...data.stamina]);
+  const bothDays = data.pe.filter(d => stamSet.has(d)).length;
+
+  document.getElementById('statDone').textContent = allDays.size;
+  document.getElementById('statBoth').textContent = bothDays;
+
+  let streak = 0;
+  const today = getToday();
+  for (let i = today; i >= 1; i--) {
+    if (peSet.has(i) || stamSet.has(i)) streak++;
+    else break;
+  }
+  document.getElementById('statStreak').textContent = streak;
+}
+
+function resetTracker() {
+  if (confirm('Reset semua progress tracker?')) {
+    data = { startDay: null, pe: [], stamina: [] };
+    save();
+    renderGrid();
+  }
+}
+
+load();
+renderGrid();
+</script>
+</body>
+</html>
