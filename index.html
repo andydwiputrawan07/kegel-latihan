@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Program 90 Hari - PE Treatment</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f0f1a; color: #e0e0e0; padding: 20px; }
+  h1 { text-align: center; color: #7c6af7; font-size: 1.6em; margin-bottom: 6px; }
+  .subtitle { text-align: center; color: #999; font-size: 0.9em; margin-bottom: 24px; }
+  .phase { background: #1a1a2e; border-radius: 12px; margin-bottom: 20px; overflow: hidden; border: 1px solid #2a2a4a; }
+  .phase-header { padding: 14px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .phase-1 .phase-header { background: linear-gradient(90deg, #1e3a5f, #1a1a2e); border-left: 4px solid #3b82f6; }
+  .phase-2 .phase-header { background: linear-gradient(90deg, #3a1e5f, #1a1a2e); border-left: 4px solid #8b5cf6; }
+  .phase-3 .phase-header { background: linear-gradient(90deg, #1e5f3a, #1a1a2e); border-left: 4px solid #10b981; }
+  .phase-icon { font-size: 1.4em; }
+  .phase-title { flex: 1; }
+  .phase-title h2 { font-size: 1.1em; color: #fff; }
+  .phase-title p { font-size: 0.8em; color: #aaa; margin-top: 2px; }
+  .phase-badge { background: #2a2a4a; padding: 4px 10px; border-radius: 20px; font-size: 0.75em; color: #bbb; }
+  .phase-content { padding: 20px; display: none; }
+  .phase-content.open { display: block; }
+  .week { background: #12122a; border-radius: 8px; padding: 14px; margin-bottom: 14px; border: 1px solid #2a2a4a; }
+  .week h3 { color: #a78bfa; font-size: 0.95em; margin-bottom: 10px; border-bottom: 1px solid #2a2a4a; padding-bottom: 6px; }
+  .exercise { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+  .ex-icon { font-size: 1em; margin-top: 2px; min-width: 20px; }
+  .ex-detail { flex: 1; }
+  .ex-name { font-size: 0.88em; font-weight: 600; color: #e0e0e0; }
+  .ex-desc { font-size: 0.8em; color: #999; margin-top: 2px; line-height: 1.4; }
+  .ex-sets { display: inline-block; background: #2a2a4a; border-radius: 4px; padding: 2px 8px; font-size: 0.75em; color: #7c6af7; margin-top: 4px; }
+  .tip-box { background: #1e3a1e; border-left: 3px solid #10b981; border-radius: 6px; padding: 10px 14px; margin-top: 12px; font-size: 0.82em; color: #a0d4a0; line-height: 1.5; }
+  .warning-box { background: #3a1e1e; border-left: 3px solid #ef4444; border-radius: 6px; padding: 10px 14px; margin-top: 10px; font-size: 0.82em; color: #f4a0a0; line-height: 1.5; }
+  .progress-bar { height: 6px; background: #2a2a4a; border-radius: 3px; margin: 16px 0 8px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; }
+  .p1-fill { background: linear-gradient(90deg, #3b82f6, #60a5fa); width: 33%; }
+  .p2-fill { background: linear-gradient(90deg, #8b5cf6, #a78bfa); width: 66%; }
+  .p3-fill { background: linear-gradient(90deg, #10b981, #34d399); width: 100%; }
+  .tracker { background: #1a1a2e; border-radius: 12px; padding: 20px; border: 1px solid #2a2a4a; margin-top: 20px; }
+  .tracker h2 { color: #7c6af7; font-size: 1em; margin-bottom: 14px; }
+  .day-grid { display: grid; grid-template-columns: repeat(13, 1fr); gap: 4px; }
+  .day-btn { aspect-ratio: 1; border-radius: 4px; background: #12122a; border: 1px solid #2a2a4a; cursor: pointer; font-size: 0.6em; color: #666; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .day-btn:hover { border-color: #7c6af7; }
+  .day-btn.done { background: #10b981; border-color: #10b981; color: #fff; }
+  .day-btn.today { border-color: #f59e0b; color: #f59e0b; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+  .stat { background: #12122a; border-radius: 8px; padding: 12px; text-align: center; border: 1px solid #2a2a4a; }
+  .stat-val { font-size: 1.5em; font-weight: 700; color: #7c6af7; }
+  .stat-label { font-size: 0.72em; color: #888; margin-top: 2px; }
+  .reset-btn { display: block; margin: 12px auto 0; background: transparent; border: 1px solid #444; color: #888; border-radius: 6px; padding: 6px 16px; font-size: 0.78em; cursor: pointer; }
+  .reset-btn:hover { border-color: #ef4444; color: #ef4444; }
+  .legend { display: flex; gap: 14px; margin-top: 10px; font-size: 0.75em; color: #888; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<h1>💪 Program 90 Hari PE Treatment</h1>
+<p class="subtitle">Berdasarkan riset medis internasional — khusus kasus kamu</p>
+
+<!-- PHASE 1 -->
+<div class="phase phase-1">
+  <div class="phase-header" onclick="toggle('p1')">
+    <div class="phase-icon">🔵</div>
+    <div class="phase-title">
+      <h2>FASE 1 — Fondasi</h2>
+      <p>Hari 1–30 · Bangun kekuatan dasar otot PC</p>
+    </div>
+    <div class="phase-badge">Hari 1-30</div>
+  </div>
+  <div id="p1" class="phase-content open">
+    <div class="progress-bar"><div class="progress-fill p1-fill"></div></div>
+    <p style="font-size:0.78em;color:#888;margin-bottom:14px">Target: Kenali otot PC, bentuk kebiasaan rutin harian</p>
+
+    <div class="week">
+      <h3>📅 Minggu 1–2: Aktivasi</h3>
+      <div class="exercise">
+        <div class="ex-icon">🔵</div>
+        <div class="ex-detail">
+          <div class="ex-name">Slow Kegel</div>
+          <div class="ex-desc">Kencangkan otot PC, tahan, lepas. Fokus rasakan otot yang benar.</div>
+          <span class="ex-sets">10x · tahan 3 detik · lepas 3 detik · 2x sehari</span>
+        </div>
+      </div>
+      <div class="exercise">
+        <div class="ex-icon">⚡</div>
+        <div class="ex-detail">
+          <div class="ex-name">Rapid Kegel</div>
+          <div class="ex-desc">Kencangkan dan lepas cepat-cepat.</div>
+          <span class="ex-sets">10x cepat · 2 set · 2x sehari</span>
+        </div>
+      </div>
+      <div class="tip-box">💡 Lakukan pagi setelah bangun + malam sebelum tidur. Bisa sambil rebahan.</div>
+    </div>
+
+    <div class="week">
+      <h3>📅 Minggu 3–4: Penguatan</h3>
+      <div class="exercise">
+        <div class="ex-icon">🔵</div>
+        <div class="ex-detail">
+          <div class="ex-name">Slow Kegel (ditingkatkan)</div>
+          <div class="ex-desc">Tambah durasi tahan.</div>
+          <span class="ex-sets">10x · tahan 5 detik · lepas 5 detik · 3 set · 2x sehari</span>
+        </div>
+      </div>
+      <div class="exercise">
+        <div class="ex-icon">⚡</div>
+        <div class="ex-detail">
+          <div class="ex-name">Rapid Kegel</div>
+          <span class="ex-sets">3 set x 10x cepat (10 detik) · 2x sehari</span>
+        </div>
+      </div>
+      <div class="exercise">
+        <div class="ex-icon">🛑</div>
+        <div class="ex-detail">
+          <div class="ex-name">Start-Stop Solo (mulai latihan)</div>
+          <div class="ex-desc">Masturbasi tanpa bokep. Berhenti saat 70% mendekati klimaks. Tunggu 30 detik. Lanjut lagi. Ulangi 3-4x baru selesai.</div>
+          <span class="ex-sets">3-4x seminggu</span>
+        </div>
+      </div>
+      <div class="warning-box">⚠️ Jangan lanjut masturbasi pakai bokep — ini bagian penting dari reset.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 2 -->
+<div class="phase phase-2">
+  <div class="phase-header" onclick="toggle('p2')">
+    <div class="phase-icon">🟣</div>
+    <div class="phase-title">
+      <h2>FASE 2 — Kontrol</h2>
+      <p>Hari 31–60 · Latih kontrol ejakulasi aktif</p>
+    </div>
+    <div class="phase-badge">Hari 31-60</div>
+  </div>
+  <div id="p2" class="phase-content">
+    <div class="progress-bar"><div class="progress-fill p2-fill"></div></div>
+    <p style="font-size:0.78em;color:#888;margin-bottom:14px">Target: Kontrol aktif saat mendekati klimaks, durasi meningkat</p>
+
+    <div class="week">
+      <h3>📅 Minggu 5–6: Intensifikasi Kegel</h3>
+      <div class="exercise">
+        <div class="ex-icon">🔵</div>
+        <div class="ex-detail">
+          <div class="ex-name">Slow Kegel Advanced</div>
+          <span class="ex-sets">15x · tahan 7 detik · lepas 5 detik · 3 set</span>
+        </div>
+      </div>
+      <div class="exercise">
+        <div class="ex-icon">💪</div>
+        <div class="ex-detail">
+          <div class="ex-name">Long Hold Kegel</div>
+          <div class="ex-desc">Tahan selama mungkin dengan kekuatan penuh.</div>
+          <span class="ex-sets">3x · tahan 20-30 detik · 3x seminggu saja</span>
+        </div>
+      </div>
+      <div class="exercise">
+        <div class="ex-icon">⚡</div>
+        <div class="ex-detail">
+          <div class="ex-name">Rapid Kegel</div>
+          <span class="ex-sets">5 set x 10x · 2x sehari</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="week">
+      <h3>📅 Minggu 7–8: Latihan Kontrol Aktif</h3>
+      <div class="exercise">
+        <div class="ex-icon">🛑</div>
+        <div class="ex-detail">
+          <div class="ex-name">Edging + Kegel Squeeze</div>
+          <div class="ex-desc">Saat mendekati klimaks, kencangkan otot PC kuat-kuat sekaligus berhenti. Tahan 10 detik. Ini melatih "rem darurat" kamu.</div>
+          <span class="ex-sets">4-5x stop per sesi · 4x seminggu</span>
+        </div>
+      </div>
+      <div class="exercise">
+        <div class="ex-icon">🤏</div>
+        <div class="ex-detail">
+          <div class="ex-name">Squeeze Technique</div>
+          <div class="ex-desc">Saat hampir klimaks, tekan bagian antara glans dan batang dengan ibu jari dan telunjuk selama 10-20 detik.</div>
+          <span class="ex-sets">Kombinasikan dengan edging</span>
+        </div>
+      </div>
+      <div class="tip-box">💡 Di fase ini kamu mulai bisa coba terapkan saat berhubungan dengan pasangan — gunakan teknik pause and tease.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 3 -->
+<div class="phase phase-3">
+  <div class="phase-header" onclick="toggle('p3')">
+    <div class="phase-icon">🟢</div>
+    <div class="phase-title">
+      <h2>FASE 3 — Mastery</h2>
+      <p>Hari 61–90 · Konsolidasi dan aplikasi nyata</p>
+    </div>
+    <div class="phase-badge">Hari 61-90</div>
+  </div>
+  <div id="p3" class="phase-content">
+    <div class="progress-bar"><div class="progress-fill p3-fill"></div></div>
+    <p style="font-size:0.78em;color:#888;margin-bottom:14px">Target: Kontrol penuh, durasi 10-15 menit tanpa alat bantu</p>
+
+    <div class="week">
+      <h3>📅 Minggu 9–10: Maintenance + Aplikasi</h3>
+      <div class="exercise">
+        <div class="ex-icon">🔵</div>
+        <div class="ex-detail">
+          <div class="ex-name">Full Kegel Routine</div>
+          <span class="ex-sets">20x slow [10 detik] + 5 set rapid + 3x long hold [30 detik]</span>
+        </div>
+      </div>
+      <div class="exercise">
+        <div class="ex-icon">🧘</div>
+        <div class="ex-detail">
+          <div class="ex-name">Mindfulness Breathing</div>
+          <div class="ex-desc">Saat berhubungan, fokus pada napas dalam dan lambat. Ini menurunkan adrenalin dan memperlambat ejakulasi.</div>
+          <span class="ex-sets">Terapkan setiap sesi</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="week">
+      <h3>📅 Minggu 11–13: Full Mastery</h3>
+      <div class="exercise">
+        <div class="ex-icon">✅</div>
+        <div class="ex-detail">
+          <div class="ex-name">Kegel Maintenance</div>
+          <div class="ex-desc">Pertahankan otot PC yang sudah terlatih.</div>
+          <span class="ex-sets">1x sehari · full routine</span>
+        </div>
+      </div>
+      <div class="exercise">
+        <div class="ex-icon">🎯</div>
+        <div class="ex-detail">
+          <div class="ex-name">Aplikasi Nyata dengan Pasangan</div>
+          <div class="ex-desc">Foreplay 15-20 menit → penetrasi dengan pause and tease → kegel squeeze saat mendekati klimaks → target durasi 10-15 menit.</div>
+          <span class="ex-sets">Terapkan setiap berhubungan</span>
+        </div>
+      </div>
+      <div class="tip-box">🏆 Di titik ini 55-83% pria sudah mengalami peningkatan signifikan berdasarkan riset medis. Kamu bisa!</div>
+    </div>
+  </div>
+</div>
+
+<!-- TRACKER -->
+<div class="tracker">
+  <h2>📊 Daily Tracker — 90 Hari</h2>
+  <div class="day-grid" id="dayGrid"></div>
+  <div class="legend">
+    <span><div class="dot" style="background:#10b981"></div> Selesai</span>
+    <span><div class="dot" style="background:#2a2a4a;border:1px solid #f59e0b"></div> Hari ini</span>
+    <span><div class="dot" style="background:#12122a;border:1px solid #2a2a4a"></div> Belum</span>
+  </div>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val" id="statDone">0</div>
+      <div class="stat-label">Hari Selesai</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="statStreak">0</div>
+      <div class="stat-label">Streak 🔥</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="statLeft">90</div>
+      <div class="stat-label">Hari Tersisa</div>
+    </div>
+  </div>
+  <button class="reset-btn" onclick="resetTracker()">Reset Tracker</button>
+</div>
+
+<script>
+function toggle(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+const STORAGE_KEY = 'pe90_tracker_v1';
+let startDay = null;
+let doneDays = new Set();
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const d = JSON.parse(raw);
+      startDay = d.startDay || null;
+      doneDays = new Set(d.doneDays || []);
+    }
+  } catch(e) {}
+}
+
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      startDay,
+      doneDays: [...doneDays]
+    }));
+  } catch(e) {}
+}
+
+function resetTracker() {
+  if (confirm('Reset semua progress? Ini tidak bisa dibatalkan.')) {
+    startDay = null;
+    doneDays = new Set();
+    saveData();
+    renderGrid();
+  }
+}
+
+function getToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+function renderGrid() {
+  const grid = document.getElementById('dayGrid');
+  grid.innerHTML = '';
+  const today = getToday();
+
+  for (let i = 1; i <= 90; i++) {
+    const btn = document.createElement('div');
+    btn.className = 'day-btn';
+    btn.textContent = i;
+
+    const key = `day_${i}`;
+    if (doneDays.has(key)) btn.classList.add('done');
+    else if (getActiveDay() === i) btn.classList.add('today');
+
+    btn.onclick = () => toggleDay(key, btn);
+    grid.appendChild(btn);
+  }
+
+  updateStats();
+}
+
+function getActiveDay() {
+  if (!startDay) return 1;
+  const start = new Date(startDay);
+  const now = new Date();
+  const diff = Math.floor((now - start) / 86400000) + 1;
+  return Math.min(Math.max(diff, 1), 90);
+}
+
+function toggleDay(key, btn) {
+  if (!startDay) {
+    startDay = new Date().toISOString().split('T')[0];
+  }
+  if (doneDays.has(key)) {
+    doneDays.delete(key);
+    btn.classList.remove('done');
+  } else {
+    doneDays.add(key);
+    btn.classList.add('done');
+  }
+  saveData();
+  updateStats();
+}
+
+function updateStats() {
+  const done = doneDays.size;
+  document.getElementById('statDone').textContent = done;
+  document.getElementById('statLeft').textContent = 90 - done;
+
+  // streak
+  let streak = 0;
+  for (let i = getActiveDay(); i >= 1; i--) {
+    if (doneDays.has(`day_${i}`)) streak++;
+    else break;
+  }
+  document.getElementById('statStreak').textContent = streak;
+}
+
+loadData();
+renderGrid();
+</script>
+</body>
+</html>
